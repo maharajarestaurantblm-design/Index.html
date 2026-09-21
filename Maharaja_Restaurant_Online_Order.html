@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maharaja Restaurant - Online Order</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#fff8ed;color:#222}
+header{background:linear-gradient(135deg,#8b0000,#d97706);color:#fff;text-align:center;padding:24px 15px}
+h1{margin:0 0 6px;font-size:30px}.tag{font-size:15px}
+.wrap{max-width:650px;margin:auto;padding:15px}
+.card{background:#fff;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #0001}
+h2{font-size:20px;margin:4px 0 12px;color:#8b0000}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #eee}
+.item:last-child{border:0}.name{font-weight:600}.price{color:#8b0000;font-weight:bold;white-space:nowrap}
+.controls{display:flex;align-items:center;gap:8px}.controls button{width:34px;height:34px;border:0;border-radius:9px;background:#8b0000;color:#fff;font-size:20px}
+.qty{min-width:22px;text-align:center;font-weight:bold}
+input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 10px;font-size:16px}
+.total{font-size:22px;font-weight:bold;text-align:right;margin:12px 0;color:#8b0000}
+.order{width:100%;padding:15px;border:0;border-radius:12px;background:#25D366;color:white;font-size:19px;font-weight:bold}
+.small{text-align:center;color:#666;font-size:13px;margin:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>👑 महाराजा रेस्टोरेंट</h1>
+<div class="tag">Pure Veg • Indian • Chinese • South Indian • Special Thali</div>
+<div style="margin-top:8px">📞 9120794030</div>
+</header>
+
+<div class="wrap">
+<div class="card">
+<h2>🍽️ अपना ऑर्डर चुनें</h2>
+<div id="menu"></div>
+<div class="total">कुल: ₹<span id="total">0</span></div>
+</div>
+
+<div class="card">
+<h2>🧾 ग्राहक की जानकारी</h2>
+<input id="name" placeholder="आपका नाम *">
+<input id="phone" placeholder="मोबाइल नंबर *" inputmode="tel">
+<textarea id="address" rows="3" placeholder="डिलीवरी पता / टेबल नंबर *"></textarea>
+<textarea id="note" rows="2" placeholder="कोई विशेष निर्देश (वैकल्पिक)"></textarea>
+<button class="order" onclick="sendOrder()">📲 WhatsApp पर Order भेजें</button>
+<div class="small">Order बटन दबाते ही आपके WhatsApp पर ऑर्डर का विवरण तैयार हो जाएगा।</div>
+</div>
+</div>
+
+<script>
+const items = [
+["समोसा",10],["चोले भटूरे",60],["चोले पूरी",30],["चोले राइस",50],
+["चोले कुलचे",80],["आलू खस्ता",50],["पनीर कुलचे",90],["कॉफी",25],
+["पेपर डोसा",70],["मसाला डोसा",80],["पनीर मसाला डोसा",100],
+["वेज बर्गर",49],["पनीर बर्गर",69],["चीज बर्गर",79],
+["स्प्रिंग रोल",30],["महाराजा थाली",199]
+];
+const cart = {};
+items.forEach((x,i)=>cart[i]=0);
+
+function render(){
+ let h="";
+ items.forEach((x,i)=>{
+   h+=`<div class="item"><div><div class="name">${x[0]}</div><div class="price">₹${x[1]}</div></div>
+   <div class="controls"><button onclick="change(${i},-1)">−</button><span class="qty">${cart[i]}</span><button onclick="change(${i},1)">+</button></div></div>`;
+ });
+ document.getElementById("menu").innerHTML=h;
+ document.getElementById("total").textContent=total();
+}
+function change(i,n){cart[i]=Math.max(0,cart[i]+n);render()}
+function total(){return items.reduce((s,x,i)=>s+x[1]*cart[i],0)}
+
+function sendOrder(){
+ const name=document.getElementById("name").value.trim();
+ const phone=document.getElementById("phone").value.trim();
+ const address=document.getElementById("address").value.trim();
+ const note=document.getElementById("note").value.trim();
+ if(!name||!phone||!address){alert("कृपया नाम, मोबाइल नंबर और पता भरें।");return}
+ const selected=items.map((x,i)=>cart[i]?`• ${x[0]} × ${cart[i]} = ₹${x[1]*cart[i]}`:"").filter(Boolean).join("\n");
+ if(!selected){alert("कृपया कम से कम एक आइटम चुनें।");return}
+ const msg=`👑 *MAHARAJA RESTAURANT - NEW ORDER*\n\nग्राहक: ${name}\nमोबाइल: ${phone}\nपता/टेबल: ${address}\n\n*ऑर्डर:*\n${selected}\n\n*कुल: ₹${total()}*${note?`\n\nनोट: ${note}`:""}`;
+ window.open("https://wa.me/919120794030?text="+encodeURIComponent(msg),"_blank");
+}
+render();
+</script>
+</body>
+</html>
